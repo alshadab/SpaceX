@@ -9,18 +9,24 @@
 		ListOutline
 	} from 'flowbite-svelte-icons';
 	import { get } from 'svelte/store';
+	import { sharedState } from '../shared/store';
 
-	let { group } = $props();
+	// Local state for the selected radio value
+	let group = null;
 
-	$effect(() => {
-		console.log('GroupSort', group);
-		return () => {
-			group;
-		};
+	// Subscribe to the store
+	sharedState.subscribe((value) => {
+		group = value;
 	});
+
+	// Function to update the shared state when a radio button is selected
+	function handleChange(event) {
+		group = event.target.value;
+		sharedState.set(group); // Update the shared store if needed
+	}
 </script>
 
-<div class="flex items-center justify-between">
+<div class="flex w-[66%] items-center justify-between">
 	<ButtonGroup>
 		<Button outline color="dark">
 			<ListOutline class="me-2 h-4 w-4 checked:text-blue-500" />
@@ -44,14 +50,17 @@
 				name="group"
 				class="focus:text-indigo-600 focus:ring-2 focus:ring-indigo-600"
 				bind:group
+				on:change={handleChange}
 				value="active">Active</Radio
 			>
 		</li>
 		<li class="rounded p-2 hover:bg-gray-100 dark:hover:bg-gray-600">
-			<Radio name="group" bind:group value="retired">Retired</Radio>
+			<Radio name="group" bind:group on:change={handleChange} value="retired">Retired</Radio>
 		</li>
 		<li class="rounded p-2 hover:bg-gray-100 dark:hover:bg-gray-600">
-			<Radio name="group" bind:group value="under construction">Under Construction</Radio>
+			<Radio name="group" bind:group on:change={handleChange} value="under construction"
+				>Under Construction</Radio
+			>
 		</li>
 	</Dropdown>
 </div>

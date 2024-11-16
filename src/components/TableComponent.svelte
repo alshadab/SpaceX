@@ -22,6 +22,8 @@
 	import { Badge } from 'flowbite-svelte';
 	import SuccesRating from '../utils/succesRating.svelte';
 	import MapComponent from './MapComponent.svelte';
+	import Chart from './Chart.svelte';
+	import { sharedState, updatedData } from '../shared/store';
 
 	function capitalizeFirstLetter(str) {
 		return str.charAt(0).toUpperCase() + str.slice(1);
@@ -41,14 +43,21 @@
 		title = item.full_name;
 	}
 
-	let { group } = $props();
+	let currentValue = $state(null);
+
+	sharedState.subscribe((value) => {
+		console.log(value);
+		currentValue = value;
+	});
+
+	// .filter((dt) => dt.status.toLowerCase() === group.toLowerCase())
 </script>
 
 <div class="mt-10 grid w-full grid-cols-3 gap-5">
 	{#await promise}
 		<TableLoader />
 	{:then data}
-		<div class="col-span-2 w-full">
+		<div class="col-span-3 w-full md:col-span-2">
 			<Table>
 				<TableHead class="border-1 border">
 					<TableHeadCell>Full Name</TableHeadCell>
@@ -59,7 +68,7 @@
 					<TableHeadCell>Wikipedia Link</TableHeadCell>
 					<TableHeadCell>Status</TableHeadCell>
 				</TableHead>
-				{#each data.filter((dt) => dt.status.toLowerCase() === group.toLowerCase()) as item}
+				{#each currentValue ? data.filter((dt) => dt.status.toLowerCase() === currentValue.toLowerCase()) : data as item}
 					<TableBody tableBodyClass="divide-y">
 						<TableBodyRow class="border-1 border">
 							<TableBodyCell>{item.full_name}</TableBodyCell>
@@ -110,9 +119,14 @@
 	{#await promise}
 		<TableLoader />
 	{:then data}
-		<div class="border-1 col-span-1 w-full rounded-md border bg-white p-5">
-			<h1 class="mb-3 font-semibold">Map View</h1>
-			<MapComponent {data} />
+		<div class="col-span-3 w-full md:col-span-1">
+			<div class="border-1 w-full rounded-md border bg-white p-5">
+				<h1 class="mb-3 font-semibold">Map View</h1>
+				<MapComponent {data} />
+			</div>
+			<div class="mt-4 inline-flex w-full justify-center">
+				<Chart landingPadsData={data} />
+			</div>
 		</div>
 	{:catch error}
 		<p>Error: {error.message}</p>
