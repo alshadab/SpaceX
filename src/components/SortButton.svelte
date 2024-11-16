@@ -8,11 +8,17 @@
 		GridSolid,
 		ListOutline
 	} from 'flowbite-svelte-icons';
+	import { get } from 'svelte/store';
 
-	export let group = 'active';
+	let { group } = $props();
+
+	$effect(() => {
+		console.log('GroupSort', group);
+		return () => {
+			group;
+		};
+	});
 </script>
-
-<!-- Rest of the code remains the same -->
 
 <div class="flex items-center justify-between">
 	<ButtonGroup>
