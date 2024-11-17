@@ -4,10 +4,9 @@
 
 	export let landingPadsData = [];
 
-	// Local state for filtering
+
 	let currentValue = null;
 
-	// Initialize chart options
 	let options = {
 		series: [],
 		colors: ['#16BDCA', '#E74694'],
@@ -45,28 +44,28 @@
 		}
 	};
 
-	// Function to update the chart data based on the filter
+
 	function updateChart() {
-		// Apply the same filtering logic as in the map
+	
 		const filteredData = currentValue
 			? landingPadsData.filter((pad) => pad.status.toLowerCase() === currentValue.toLowerCase())
 			: landingPadsData;
 
-		// Recalculate totals
 		const totalLandingPads = filteredData.length;
 		const successfulLandingPads = filteredData.filter((pad) => pad.successful_landings > 0).length;
 
-		// Update the chart options
 		options.series = [successfulLandingPads, totalLandingPads - successfulLandingPads];
 	}
 
-	// Subscribe to sharedState to get the current filter value
 	sharedState.subscribe((value) => {
-		currentValue = value;
+		if(value === "null"){
+			currentValue = null
+		}else{
+			currentValue = value;
+		}
 		updateChart();
 	});
-
-	// Initial chart setup with all data
+	
 	updateChart();
 </script>
 

@@ -1,37 +1,48 @@
 <script>
 	import { ButtonGroup, Button, Dropdown, DropdownItem, Radio } from 'flowbite-svelte';
 	import {
-		UserCircleSolid,
 		AdjustmentsVerticalOutline,
-		DownloadSolid,
 		ChevronDownOutline,
 		GridSolid,
 		ListOutline
 	} from 'flowbite-svelte-icons';
 	import { get } from 'svelte/store';
-	import { sharedState } from '../shared/store';
+	import { sharedState,updatedData } from '../shared/store';
 
-	// Local state for the selected radio value
-	let group = null;
 
-	// Subscribe to the store
+	let group =$state( "null");
+	let type = $state(false)
+
 	sharedState.subscribe((value) => {
-		group = value;
+		if(value === "null"){
+			group = null
+		}else{
+			group = value;
+		}
 	});
 
-	// Function to update the shared state when a radio button is selected
+	updatedData.subscribe((value) => {
+		type = value;
+	});
+
+
 	function handleChange(event) {
 		group = event.target.value;
-		sharedState.set(group); // Update the shared store if needed
+		sharedState.set(group); 
+	}
+
+	function handleChangeType(data) {
+		type =data
+		updatedData.set(type); 
 	}
 </script>
 
 <div class="flex w-[66%] items-center justify-between">
 	<ButtonGroup>
-		<Button outline color="dark">
-			<ListOutline class="me-2 h-4 w-4 checked:text-blue-500" />
+		<Button   checked={!type} onclick={() =>handleChangeType(false) }  outline >
+			<ListOutline class="me-2 h-4 w-4 " />
 		</Button>
-		<Button outline color="dark">
+		<Button checked={type}  onclick={() =>handleChangeType(true) } outline >
 			<GridSolid class="me-2 h-4 w-4" />
 		</Button>
 	</ButtonGroup>
@@ -45,6 +56,15 @@
 		/></Button
 	>
 	<Dropdown class="w-48 space-y-1 p-3 ">
+		<li class="rounded p-2 hover:bg-gray-100 dark:hover:bg-gray-600">
+			<Radio
+				name="all"
+				class="focus:text-indigo-600 focus:ring-2 focus:ring-indigo-600"
+				bind:group
+				on:change={handleChange}
+				value="null">All</Radio
+			>
+		</li>
 		<li class="rounded p-2 hover:bg-gray-100 dark:hover:bg-gray-600">
 			<Radio
 				name="group"

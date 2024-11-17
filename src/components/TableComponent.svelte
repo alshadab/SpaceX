@@ -10,11 +10,6 @@
 		TableHeadCell
 	} from 'flowbite-svelte';
 	import { LinkOutline } from 'flowbite-svelte-icons';
-	import { goto } from '$app/navigation';
-	import { writable } from 'svelte/store';
-	import { get } from 'svelte/store';
-
-	import { onMount } from 'svelte';
 	import TableLoader from '../utils/TableLoader.svelte';
 	let data;
 	let promise = fetch('https://api.spacexdata.com/v3/landpads').then((res) => res.json());
@@ -24,6 +19,7 @@
 	import MapComponent from './MapComponent.svelte';
 	import Chart from './Chart.svelte';
 	import { sharedState, updatedData } from '../shared/store';
+	import GridCard from './GridCard.svelte';
 
 	function capitalizeFirstLetter(str) {
 		return str.charAt(0).toUpperCase() + str.slice(1);
@@ -32,7 +28,7 @@
 	function navigateToAbout(url) {
 		window.location = url;
 	}
-	// export let group = '';
+
 	let showModal = $state(false);
 	let details = $state('');
 	let title = $state('');
@@ -44,19 +40,41 @@
 	}
 
 	let currentValue = $state(null);
+	let type = $state(false)
 
-	sharedState.subscribe((value) => {
-		console.log(value);
-		currentValue = value;
+	
+	updatedData.subscribe((value) => {
+		type = value;
 	});
 
-	// .filter((dt) => dt.status.toLowerCase() === group.toLowerCase())
+	sharedState.subscribe((value) => {
+	
+		if(value === "null"){
+			currentValue = null
+		}else{
+			currentValue = value;
+		}
+		
+	});
 </script>
 
 <div class="mt-10 grid w-full grid-cols-3 gap-5">
 	{#await promise}
 		<TableLoader />
 	{:then data}
+	{#if type}
+	<div class="col-span-3 w-full md:col-span-2">
+		<div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+			{#each currentValue ? data.filter((dt) => dt.status.toLowerCase() === currentValue.toLowerCase()) : data as item}
+			<GridCard item={item} />
+			{/each}
+		</div>
+	
+	</div>
+
+ 
+	
+	{:else}
 		<div class="col-span-3 w-full md:col-span-2">
 			<Table>
 				<TableHead class="border-1 border">
@@ -107,6 +125,7 @@
 				{/each}
 			</Table>
 		</div>
+	{/if}
 	{:catch error}
 		<p>Error: {error.message}</p>
 	{/await}

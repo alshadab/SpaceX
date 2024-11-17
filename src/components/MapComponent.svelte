@@ -1,5 +1,4 @@
 <script>
-	import { onMount } from 'svelte';
 	import Map from 'ol/Map';
 	import View from 'ol/View';
 	import TileLayer from 'ol/layer/Tile';
@@ -16,37 +15,37 @@
 	import { extend } from 'ol/extent';
 	import { sharedState } from '../shared/store';
 
-	export let data;
+	 let {data} = $props()
 
 	let currentValue = null;
 	let map;
 	let vectorSource;
 
-	// Subscribe to sharedState and filter the data
+
 	sharedState.subscribe((value) => {
-		currentValue = value;
+		if(value === "null"){
+			currentValue = null
+		}else{
+			currentValue = value;
+		}
 		filterData();
 	});
 
-	// Function to filter the data based on currentValue
+
 	function filterData() {
-		// Create a new filtered data array to ensure reactivity
+
 		const filteredData = currentValue
 			? data.filter((dt) => dt.status.toLowerCase() === currentValue.toLowerCase())
 			: data;
 
-		// Update the map with the new filtered data
+	
 		updateMap(filteredData);
 	}
 
-	// Function to update the map with filtered data
+
 	function updateMap(filteredData) {
 		if (!map || !vectorSource) return;
-
-		// Clear the existing features from the vector source
 		vectorSource.clear();
-
-		// Generate new features based on the filtered data
 		const features = [];
 		let extent = undefined;
 
@@ -61,7 +60,7 @@
 			feature.setStyle(
 				new Style({
 					image: new CircleStyle({
-						radius: 10, // Circle size
+						radius: 10,
 						fill: new Fill({ color: 'rgba(0, 255, 0, 0.8)' }),
 						stroke: new Stroke({ color: '#00FF00', width: 2 })
 					})
@@ -74,17 +73,16 @@
 			extent = extent ? extend(extent, featureExtent) : featureExtent;
 		});
 
-		// Add new features to the vector source
+
 		vectorSource.addFeatures(features);
 
-		// Fit the map view to the new extent
+
 		if (extent) {
 			map.getView().fit(extent, { padding: [50, 50, 50, 50], duration: 1000 });
 		}
 	}
 
-	// Initialize the map on mount
-	onMount(() => {
+	$effect(() => {
 		vectorSource = new VectorSource();
 
 		const vectorLayer = new VectorLayer({
@@ -105,7 +103,6 @@
 			})
 		});
 
-		// Initially update the map with all data
 		updateMap(data);
 	});
 </script>
