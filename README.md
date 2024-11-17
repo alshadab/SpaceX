@@ -1,18 +1,20 @@
-# sv
-
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
-
 ## Creating a project
 
 If you're seeing this, you've probably already done this step. Congrats!
 
 ```bash
-# create a new project in the current directory
-npx sv create
+# To install the project
+npm install
 
-# create a new project in my-app
-npx sv create my-app
+
 ```
+
+## Install Packages
+
+You have to install:
+
+FlowBite from here : https://flowbite-svelte.com/
+Open Layers for map from here: https://openlayers.org/
 
 ## Developing
 
